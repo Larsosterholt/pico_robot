@@ -1,21 +1,40 @@
 #include "MotorDriver.h"
 #include <Arduino.h>
 
-MotorDriver::MotorDriver(int motorPin1, int motorPin2, Encoder* encoder)
-: _motorPin1(motorPin1), _motorPin2(motorPin2), _encoder(encoder) {}
+MotorDriver::MotorDriver(int motorPin1, int motorPin2, int motorSpeedPin, float wheelCircumference)
+: _motorPin1(motorPin1), 
+_motorPin2(motorPin2), 
+_motorSpeedPin(motorSpeedPin), 
+_wheelCircumference(wheelCircumference) {}
 
 void MotorDriver::initialize() {
     pinMode(_motorPin1, OUTPUT);
     pinMode(_motorPin2, OUTPUT);
-    // Initialize other motor-related setups
+    digitalWrite(_motorPin1, HIGH);
+    digitalWrite(_motorPin2, LOW);
+
+    pinMode(_motorSpeedPin, OUTPUT);
 }
 
-void MotorDriver::setSpeed(int speed) {
+void MotorDriver::setSpeed(float speed) {
+
+
+    if(speed >= 0){
+        digitalWrite(_motorPin1, HIGH);
+        digitalWrite(_motorPin2, LOW);
+        analogWrite(_motorSpeedPin, abs(speed));  
+    } 
+    else {
+        digitalWrite(_motorPin1, !HIGH);
+        digitalWrite(_motorPin2, !LOW);
+        analogWrite(_motorSpeedPin, abs(speed));  
+    }
+
     Serial.print("Speed set to");
     Serial.println(speed);
+
 }
 
-void MotorDriver::update() {
-    // You can use _encoder->getCount() here to get the encoder count
-    // and use it for feedback control or other purposes
+void MotorDriver::updateSpeed(float speed) {
+    _wheelSpeed = speed;
 }
