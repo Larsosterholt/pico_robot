@@ -15,10 +15,19 @@ const int leftEncoderPinB = 22;
 volatile long leftEncoderPos = 0;
 bool leftLastEncoded = LOW;
 
+
 // "Defines"
-const int countsPerRef = 12;
-//const int loopTime = 10;
+const int countsPerRev = 12*90;
 const float wheelCircumference = 3.1415*(65);
+unsigned long lastTime = 0;
+const unsigned long loopInterval = 50;
+volatile long rightLastEncoderPos = 0;
+volatile long leftLastEncoderPos = 0;
+
+MotorDriver rightMotor(16, 17, 18, wheelCircumference);
+MotorDriver leftMotor(14, 15, 13, wheelCircumference);
+
+
 
 void RightUpdateEncoderISR() {
   int MSB = digitalRead(rightEncoderPinA); // MSB = most significant bit
@@ -48,6 +57,8 @@ void LeftUpdateEncoderISR() {
 
 
 void setup() {
+  Serial.begin(9600);
+
   attachInterrupt(digitalPinToInterrupt(rightEncoderPinA), RightUpdateEncoderISR, CHANGE);
   attachInterrupt(digitalPinToInterrupt(rightEncoderPinB), RightUpdateEncoderISR, CHANGE);
   pinMode(rightEncoderPinA, INPUT);
@@ -57,7 +68,9 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(leftEncoderPinB), LeftUpdateEncoderISR, CHANGE);
   pinMode(leftEncoderPinA, INPUT);
   pinMode(leftEncoderPinB, INPUT);
-  Serial.begin(9600);
+
+  leftMotor.initialize(5.0);
+  rightMotor.initialize(5.0);
 }
 
 
@@ -65,37 +78,26 @@ void setup() {
 
 
 void loop() {
-  unsigned long lastTime = 0;
-  const unsigned long loopInterval = 50;
-  volatile long rightLastEncoderPos = 0;
-  volatile long leftLastEncoderPos = 0;
-
-  //Serial.print("Right wheel: ");
-  //Serial.println(rightEncoderPos);
-  //Serial.print("Left wheel: ");
-  //Serial.println(leftEncoderPos);
-  //delay(100);
-
-  MotorDriver rightMotor(16, 17, 18, wheelCircumference);
-  rightMotor.initialize();
-
-  MotorDriver leftMotor(14, 15, 13, wheelCircumference);
-  leftMotor.initialize();
+  
 
   if (millis() - lastTime >= loopInterval) {
     long interval = millis() - lastTime;
 
     // Right motor speed calculation
-    float rightSpeed = (1000.0 * (rightEncoderPos - rightLastEncoderPos) / interval) * wheelCircumference;
+    float rightSpeed = (1000.0 * (rightEncoderPos - rightLastEncoderPos) / interval) * wheelCircumference/countsPerRev;
     rightMotor.updateSpeed(rightSpeed);
     rightLastEncoderPos = rightEncoderPos;
-    Serial.print("Right wheel speed: ");
-    Serial.println(rightSpeed, 5);
+
 
     // Left motor speed calculation
-    float leftSpeed = (1000.0 * (leftEncoderPos - leftLastEncoderPos) / interval) * wheelCircumference;
+    float leftSpeed = (1000.0 * (leftEncoderPos - leftLastEncoderPos) / interval) * wheelCircumference/countsPerRev;
     leftMotor.updateSpeed(leftSpeed);
     leftLastEncoderPos = leftEncoderPos;
+    
+    Serial.print("L: ");
+    Serial.print(leftSpeed);
+    Serial.print(" R: ");
+    Serial.println(rightSpeed);
 
     lastTime = millis();
   }
