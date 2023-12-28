@@ -1,10 +1,10 @@
 #include "MotorDriver.h"
 #include <Arduino.h>
 
-MotorDriver::MotorDriver(int motorPin1, int motorPin2, int motorSpeedPin, float wheelCircumference)
+MotorDriver::MotorDriver(int motorPin1, int motorPin2, int motorPWMPin, float wheelCircumference)
 : _motorPin1(motorPin1), 
 _motorPin2(motorPin2), 
-_motorSpeedPin(motorSpeedPin), 
+_motorPWMPin(motorPWMPin), 
 _wheelCircumference(wheelCircumference) {}
 
 void MotorDriver::initialize(float pGain) {
@@ -13,7 +13,8 @@ void MotorDriver::initialize(float pGain) {
     digitalWrite(_motorPin1, HIGH);
     digitalWrite(_motorPin2, LOW);
 
-    pinMode(_motorSpeedPin, OUTPUT);
+    pinMode(_motorPWMPin, OUTPUT);
+    analogWrite(_motorPWMPin, 0);
     _pGain = pGain;
 }
 
@@ -22,12 +23,12 @@ void MotorDriver::setSpeed(int speed) {
     if(speed >= 0){
         digitalWrite(_motorPin1, HIGH);
         digitalWrite(_motorPin2, LOW);
-        analogWrite(_motorSpeedPin, abs(speed));  
+        analogWrite(_motorPWMPin, abs(speed));  
     } 
     else {
         digitalWrite(_motorPin1, !HIGH);
         digitalWrite(_motorPin2, !LOW);
-        analogWrite(_motorSpeedPin, abs(speed));  
+        analogWrite(_motorPWMPin, abs(speed));  
     }
 
     //Serial.print("Speed set to");
@@ -45,4 +46,18 @@ void MotorDriver::setSpeedSetPoint(int speed){
     int pwmSetSetPoint = (int)(diff*_pGain);
     
     setSpeed(pwmSetSetPoint);
+
+}
+
+float MotorDriver::getCurrentSpeed(){
+    return _wheelSpeed;
+}
+
+void MotorDriver::setProportionalGain(float gain){
+    _pGain = gain;
+}
+
+
+float MotorDriver::getProportionalGain(){
+    return _pGain;
 }

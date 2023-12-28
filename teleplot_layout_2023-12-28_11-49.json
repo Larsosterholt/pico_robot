@@ -1,0 +1,125 @@
+{
+   "widgets": [
+      {
+         "type": "single_value_number",
+         "gridPos": {
+            "h": 6,
+            "w": 6,
+            "x": 0,
+            "y": 0
+         },
+         "series": [
+            {
+               "name": "P_gain",
+               "sourceNames": [
+                  "P_gain"
+               ],
+               "formula": "",
+               "options": {
+                  "stroke": "rgba(231,76,60,1)",
+                  "fill": "rgba(231,76,60,0.1)"
+               },
+               "type": "number"
+            }
+         ],
+         "precision_mode": 1
+      },
+      {
+         "type": "chart",
+         "gridPos": {
+            "h": 6,
+            "w": 6,
+            "x": 0,
+            "y": 0
+         },
+         "series": [
+            {
+               "name": "Left_SP",
+               "sourceNames": [
+                  "Left_SP"
+               ],
+               "formula": "",
+               "options": {
+                  "_serie": "Left_SP",
+                  "stroke": "rgba(231,76,60,1)",
+                  "fill": "rgba(231,76,60,0.1)"
+               },
+               "type": "number"
+            }
+         ]
+      },
+      {
+         "type": "chart",
+         "gridPos": {
+            "h": 6,
+            "w": 6,
+            "x": 0,
+            "y": 0
+         },
+         "series": [
+            {
+               "name": "Right_SP",
+               "sourceNames": [
+                  "Right_SP"
+               ],
+               "formula": "",
+               "options": {
+                  "_serie": "Right_SP",
+                  "stroke": "rgba(231,76,60,1)",
+                  "fill": "rgba(231,76,60,0.1)"
+               },
+               "type": "number"
+            }
+         ]
+      },
+      {
+         "type": "chart",
+         "gridPos": {
+            "h": 6,
+            "w": 6,
+            "x": 0,
+            "y": 0
+         },
+         "series": [
+            {
+               "name": "Left_speed",
+               "sourceNames": [
+                  "Left_speed"
+               ],
+               "formula": "",
+               "options": {
+                  "_serie": "Left_speed",
+                  "stroke": "rgba(231,76,60,1)",
+                  "fill": "rgba(231,76,60,0.1)"
+               },
+               "type": "number"
+            }
+         ]
+      },
+      {
+         "type": "chart",
+         "gridPos": {
+            "h": 6,
+            "w": 6,
+            "x": 0,
+            "y": 0
+         },
+         "series": [
+            {
+               "name": "Right_speed",
+               "sourceNames": [
+                  "Right_speed"
+               ],
+               "formula": "",
+               "options": {
+                  "_serie": "Right_speed",
+                  "stroke": "rgba(231,76,60,1)",
+                  "fill": "rgba(231,76,60,0.1)"
+               },
+               "type": "number"
+            }
+         ]
+      }
+   ],
+   "viewDuration": 15
+}

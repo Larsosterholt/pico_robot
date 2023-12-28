@@ -10,9 +10,12 @@ public:
     void setSpeed(int speed);
     void updateSpeed(float speed);
     void setSpeedSetPoint(int speed);
+    float getCurrentSpeed();
+    void setProportionalGain(float gain);
+    float getProportionalGain();
 
 private:
-    int _motorPin1, _motorPin2, _motorSpeedPin;
+    int _motorPin1, _motorPin2, _motorPWMPin;
     float _wheelCircumference, _wheelSpeed, _pGain = 0;
     
 };
