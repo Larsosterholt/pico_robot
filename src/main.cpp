@@ -3,11 +3,15 @@
 
 // /media/lars/RPI-RP2
 
+// #define DEBUG_PRINT
+
 // Right motor global varibles
 const int rightEncoderPinA = 19;
 const int rightEncoderPinB = 20;
 volatile long rightEncoderPos = 0;
 bool lightLastEncoded = LOW;
+const unsigned long printInterval = 1000;
+unsigned long lastPrintTime = 0;
 
 // Left motor global varibles
 const int leftEncoderPinA = 21;
@@ -29,7 +33,7 @@ MotorDriver leftMotor(14, 15, 13, wheelCircumference);
 int targetLeftSpeed = 0;
 int targetRightSpeed = 0;
 
-float alpha = 0.05;  // Example value, adjust as needed for your filter strength
+float alpha = 0.8; // Example value, adjust as needed for your filter strength
 float lastFilteredRightSpeed = 0;
 float lastFilteredLeftSpeed = 0;
 
@@ -65,19 +69,37 @@ void LeftUpdateEncoderISR()
   leftLastEncoded = encoded;
 }
 
-void parseCommand(String command) {
+void parseCommand(String command)
+{
 
   command.trim();
-  if (command.startsWith("L") && command.indexOf("R") > -1) {
+  if (command.startsWith("P"))
+  {
+    float pGain = command.substring(1).toFloat();
+    rightMotor.setProportionalGain(pGain);
+    leftMotor.setProportionalGain(pGain);
+  }
+  else if (command.startsWith("I"))
+  {
+    float iGain = command.substring(1).toFloat();
+    rightMotor.setIntegralGain(iGain);
+    leftMotor.setIntegralGain(iGain);
+  }
+  else if (command.startsWith("D"))
+  {
+    float dGain = command.substring(1).toFloat();
+    rightMotor.setDerivativeGain(dGain);
+    leftMotor.setDerivativeGain(dGain);
+  }
+  else if (command.startsWith("A"))
+  {
+    alpha = command.substring(1).toFloat();
+  }
+  else if (command.startsWith("L") && command.indexOf("R") > -1)
+  {
     int rIndex = command.indexOf("R");
     targetLeftSpeed = command.substring(1, rIndex).toInt();
     targetRightSpeed = command.substring(rIndex + 1).toInt();
-  }
-  else if (command.startsWith("G")) {
-    float controllerGain = command.substring(1).toFloat();
-
-    rightMotor.setProportionalGain(controllerGain);
-    leftMotor.setProportionalGain(controllerGain);
   }
   else if (command.equals("GETSPEED"))
   {
@@ -95,7 +117,8 @@ void updateMotorSpeeds()
   rightMotor.setSpeedSetPoint(targetRightSpeed);
 }
 
-void updateWheelSpeed() {
+void updateWheelSpeed()
+{
   long interval = millis() - lastTime;
 
   // Right motor speed calculation
@@ -115,7 +138,6 @@ void updateWheelSpeed() {
   lastTime = millis();
 }
 
-
 void setup()
 {
   Serial.begin(115200);
@@ -131,35 +153,50 @@ void setup()
   pinMode(leftEncoderPinA, INPUT);
   pinMode(leftEncoderPinB, INPUT);
 
-  leftMotor.initialize(4.0);
-  rightMotor.initialize(4.0);
+  leftMotor.initialize(1.5, 0.2, 0.05);
+  rightMotor.initialize(1.5, 0.2, 0.05);
 }
 
 void loop()
 {
 
+  if (millis() - lastPrintTime >= printInterval)
+  {
+    Serial.println(".");
+    lastPrintTime = millis();
+  }
+
   if (millis() - lastTime >= loopInterval)
   {
     updateWheelSpeed();
+    lastTime = millis();
+#ifdef DEBUG_PRINT
 
+    Serial.print(">Right_speed: ");
+    Serial.println(rightMotor.getCurrentSpeed());
 
-/*
-  Serial.print(">Right_speed: ");
-  Serial.println(rightMotor.getCurrentSpeed());
+    Serial.print(">Left_speed: ");
+    Serial.println(leftMotor.getCurrentSpeed());
 
-  Serial.print(">Left_speed: ");
-  Serial.println(leftMotor.getCurrentSpeed());
+    Serial.print(">Left_SP: ");
+    Serial.println(targetLeftSpeed);
 
-  Serial.print(">Left_SP: ");
-  Serial.println(targetLeftSpeed);
+    Serial.print(">Right_SP: ");
+    Serial.println(targetRightSpeed);
 
-  Serial.print(">Right_SP: ");
-  Serial.println(targetRightSpeed);
+    Serial.print(">P_gain: ");
+    Serial.println(rightMotor.getProportionalGain());
 
-  Serial.print(">P_gain: ");
-  Serial.println(rightMotor.getProportionalGain());
-*/
-  Serial.println(".");
+    Serial.print(">I_gain: ");
+    Serial.println(rightMotor.getIntegralGain());
+
+    Serial.print(">D_gain: ");
+    Serial.println(rightMotor.getDerivativeGain());
+
+    Serial.print(">Alpha: ");
+    Serial.println(alpha);
+
+#endif
   }
 
   if (Serial.available() > 0)
@@ -169,6 +206,4 @@ void loop()
   }
 
   updateMotorSpeeds();
-
-
 }
