@@ -169,7 +169,8 @@ void loop()
   if (millis() - lastTime >= loopInterval)
   {
     updateWheelSpeed();
-    lastTime = millis();
+    updateMotorSpeeds();
+    
 #ifdef DEBUG_PRINT
 
     Serial.print(">Right_speed: ");
@@ -197,6 +198,7 @@ void loop()
     Serial.println(alpha);
 
 #endif
+  lastTime = millis();
   }
 
   if (Serial.available() > 0)
@@ -205,5 +207,5 @@ void loop()
     parseCommand(command);
   }
 
-  updateMotorSpeeds();
+  
 }
